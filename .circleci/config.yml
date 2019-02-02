@@ -23,8 +23,19 @@ jobs:
           name: "Build docker image & push to docker hub"
           command: |
             cp Dockerfile.production Dockerfile
-            docker build -t p4ng/example-nodejs-circle:lastest .
+            docker build -t p4ng/example-nodejs-circle:latest .
             docker build -t p4ng/example-nodejs-circle:${CIRCLE_SHA1} .
-            docker push p4ng/example-nodejs-circle:lastest
-            docker push p4ng/example-nodejs-circle:${CIRCLE_SHA1} 
+            docker push p4ng/example-nodejs-circle:latest
+            docker push p4ng/example-nodejs-circle:${CIRCLE_SHA1}
+      - run:
+          name: "Call rancher to deploy"
+          command: |
+            docker container run --rm -it \
+            -e CATTEL_ACCESS_KEY="$CATTLE_ACCESS_KEY" \
+            -e CATTLE_SECRET_KEY="$CATTLE_SECRET_KEY" \
+            -e CATTLE_URL="$CATTLE_URL" \
+            p4ng/example-nodejs-circle upgrade $RANCHER_EXAMPLE_NODEJS \
+            --imageUuid 'docker:p4ng/example-nodejs-circle:latest' \
+            --batch_size 3 --start_first \
+            --auto_complete --timeout 600 
       - run: echo Done
