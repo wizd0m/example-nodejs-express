@@ -27,7 +27,6 @@ jobs:
             docker build -t p4ng/example-nodejs-circle:${CIRCLE_SHA1} .
             docker push p4ng/example-nodejs-circle:latest
             docker push p4ng/example-nodejs-circle:${CIRCLE_SHA1}
-      - setup_remote_docker
       - run:
           name: "Call rancher to deploy"
           command: |
